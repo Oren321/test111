@@ -1,0 +1,217 @@
+--Gui
+Private = loadstring(game:HttpGet("https://raw.githubusercontent.com/Oren321/Gui/refs/heads/main/Gui", true))()
+
+--Window
+local Window = Private:Window({
+   Title = "Pets Go | Private Script", 
+   Size = {
+       X = 550,
+       Y = 400
+   }
+})
+
+--AutoFarm Tab
+local AutoFarmTab = Window:Tab({
+   Name = "AutoFarm",
+   tabColor = Color3.fromRGB(255, 105, 180),
+   Image = "rbxassetid://10709769841"
+})
+
+local isToggled = false
+
+AutoFarmTab:Toggle({
+   Name = "Auto Roll",
+   Default = false,
+   Callback = function(var)
+       isToggled = var
+       while isToggled do
+           game:GetService("ReplicatedStorage").Network.Eggs_Roll:InvokeServer()
+           task.wait()
+       end
+   end
+})
+
+--Event Tab
+local EventTab = Window:Tab({
+   Name = "Clover Event",
+   tabColor = Color3.fromRGB(255, 105, 180),
+   Image = "rbxassetid://10709806995"
+})
+
+local isToggled = false
+
+EventTab:Toggle({
+   Name = "Auto Open Pot Of Gold At Max",
+   Default = false,
+   Callback = function(var)
+       isToggled = var
+       if isToggled then
+           spawn(function()
+               while isToggled do
+                   local TycoonCmds = require(game:GetService("ReplicatedStorage").Library.Client.TycoonCmds)
+                   local Clover = require(game:GetService("ReplicatedStorage").Library.Directory.Tycoons).Clover
+                   local CloverEventCmds = require(game:GetService("ReplicatedStorage").Library.Client.CloverEventCmds)
+
+                   local MINE = TycoonCmds.Get(Clover)
+
+                   if MINE then
+                       local currentPoints = CloverEventCmds.GetEggPoints(MINE)
+                       local maxPoints = CloverEventCmds.GetMaxEggPoints(MINE)
+
+                       if currentPoints >= maxPoints then
+                           game:GetService("ReplicatedStorage"):WaitForChild("Network")
+                               :WaitForChild("Clovers_HatchEgg"):InvokeServer()
+                       end
+                   end
+                   task.wait()
+               end
+           end)
+       else
+           isToggled = false
+       end
+   end
+})
+
+local isToggled = false
+
+EventTab:Toggle({
+   Name = "Auto Collect Clovers",
+   Default = false,
+   Callback = function(var)
+       isToggled = var
+       if isToggled then
+           task.spawn(function()
+               local clovers = workspace.__THINGS.Clovers
+
+               local function fireTouchInterest(part)
+                   local playerChar = game.Players.LocalPlayer.Character
+                   local primaryPart = playerChar and playerChar.PrimaryPart or part
+                   firetouchinterest(part, primaryPart, 0)
+                   firetouchinterest(part, primaryPart, 1)
+               end
+
+               while isToggled do
+                   for _, model in pairs(clovers:GetChildren()) do
+                       local part = model:FindFirstChild("Part")
+                       if part then
+                           fireTouchInterest(part)
+                       end
+                   end
+                   task.wait()
+               end
+           end)
+       else
+           isToggled = false
+       end
+   end
+})
+
+local isToggled = false
+
+EventTab:Toggle({
+   Name = "Auto Collect Hoppers Loot",
+   Default = false,
+   Callback = function(var)
+       isToggled = var
+       if isToggled then
+           task.spawn(function()
+               while isToggled do
+                   game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Clovers_HopperClaim"):InvokeServer()
+                   task.wait(5)
+               end
+           end)
+       else
+           isToggled = false
+       end
+   end
+})
+
+local isToggled = false
+
+local patches = { "Patch_1", "Patch_2", "Patch_3", "Patch_4", "Patch_5", "Patch_6", "Patch_7", "Patch_8" }
+local categories = { "", "_Farmer", "_Speed1", "_Speed2", "_Quality1", "_Quality2", "_Speed3", "_Quality3" }
+
+EventTab:Toggle({
+   Name = "Auto Buy Clover Pads",
+   Default = false,
+   Callback = function(var)
+       isToggled = var
+       if isToggled then
+           task.spawn(function()
+               while isToggled do
+                   for _, patch in ipairs(patches) do
+                       for _, category in ipairs(categories) do
+                           local args = {
+                               [1] = patch .. category,
+                               [2] = "Clover"
+                           }
+                           game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Tycoons: Purchase"):InvokeServer(unpack(args))
+                           task.wait()
+                       end
+                   end
+               end
+           end)
+       else
+           isToggled = false
+       end
+   end
+})
+
+--Fish Tab
+local FishTab = Window:Tab({
+    Name = "Auto Fish",
+    tabColor = Color3.fromRGB(255, 105, 180),
+    Image = "rbxassetid://10709798174"
+})
+
+local FishingSpots = {
+    "Default",
+    "Ice",
+    "Kraken",
+    "Corrupted",
+}
+
+FishTab:Dropdown({
+    Name = "Select Fishing Spot",
+    Default = "Default",
+    Items = FishingSpots,
+    Multiselect = false,
+    Callback = function(Value)
+        selectedFishingSpot = Value
+    end
+})
+
+local isToggled = false
+
+FishTab:Toggle({
+    Name = "Auto Fish",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        if isToggled then
+            while isToggled do
+                local args = {
+                    [1] = selectedFishingSpot
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Fish"):InvokeServer(unpack(args))
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Success"):FireServer()
+                task.wait()
+            end
+        end
+    end
+})
+
+local isToggled = false
+
+FishTab:Toggle({
+    Name = "Claim Fishing Storage Loot",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        if isToggled then
+        while isToggled do
+            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_FishermanClaim"):InvokeServer()
+            task.wait()
+        end
+    end
+})
