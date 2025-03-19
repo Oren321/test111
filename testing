@@ -1,25 +1,37 @@
---Gui
-Private = loadstring(game:HttpGet("https://raw.githubusercontent.com/Oren321/Gui/refs/heads/main/Gui", true))()
+-- Gui Source
+local PrivateScript = loadstring(game:HttpGet("https://raw.githubusercontent.com/OrenSck/Src/refs/heads/main/Gui", true))()
 
---Window
-local Window = Private:Window({
-   Title = "Pets Go | Private Script", 
-   Size = {
-       X = 550,
-       Y = 400
-   }
+-- Making The Window
+local window = PrivateScript:Window({
+    Title = "Pets Go | Private Script", 
+    isMobile = false,
+    Size = {
+        X = 550,
+        Y = 400
+    },
+    CustomTheme = {
+        defaultTab = Color3.fromHex("#a49ae6"),
+        background = Color3.fromRGB(40, 44, 50),
+        secondaryBackground = Color3.fromRGB(49, 56, 66),
+        tertiaryBackground = Color3.fromRGB(57, 63, 75),
+        text = Color3.fromRGB(220,221,225),
+        image = Color3.fromRGB(220,221,225),
+        placeholder = Color3.fromRGB(165,166,169),
+        close = Color3.fromRGB(190, 100, 105)
+    },
+    KeyCode = Enum.KeyCode.T
 })
 
 --AutoFarm Tab
-local AutoFarmTab = Window:Tab({
-   Name = "AutoFarm",
-   tabColor = Color3.fromRGB(255, 105, 180),
-   Image = "rbxassetid://10709769841"
+local AutoFarm = window:Tab({
+    Name = "AutoFarm",
+    tabColor = Color3.fromRGB(180, 240, 67),
+    Image = "rbxassetid://10709769841"
 })
 
 local isToggled = false
 
-AutoFarmTab:Toggle({
+AutoFarm:Toggle({
    Name = "Auto Roll",
    Default = false,
    Callback = function(var)
@@ -31,16 +43,16 @@ AutoFarmTab:Toggle({
    end
 })
 
---Event Tab
-local EventTab = Window:Tab({
-   Name = "Clover Event",
-   tabColor = Color3.fromRGB(255, 105, 180),
-   Image = "rbxassetid://10709806995"
+--Clover Event
+local Clover = window:Tab({
+    Name = "Clover Event",
+    tabColor = Color3.fromRGB(180, 240, 67),
+    Image = "rbxassetid://10709769841"
 })
 
 local isToggled = false
 
-EventTab:Toggle({
+Clover:Toggle({
    Name = "Auto Open Pot Of Gold At Max",
    Default = false,
    Callback = function(var)
@@ -74,144 +86,54 @@ EventTab:Toggle({
 
 local isToggled = false
 
-EventTab:Toggle({
-   Name = "Auto Collect Clovers",
-   Default = false,
-   Callback = function(var)
-       isToggled = var
-       if isToggled then
-           task.spawn(function()
-               local clovers = workspace.__THINGS.Clovers
-
-               local function fireTouchInterest(part)
-                   local playerChar = game.Players.LocalPlayer.Character
-                   local primaryPart = playerChar and playerChar.PrimaryPart or part
-                   firetouchinterest(part, primaryPart, 0)
-                   firetouchinterest(part, primaryPart, 1)
-               end
-
-               while isToggled do
-                   for _, model in pairs(clovers:GetChildren()) do
-                       local part = model:FindFirstChild("Part")
-                       if part then
-                           fireTouchInterest(part)
-                       end
-                   end
-                   task.wait()
-               end
-           end)
-       else
-           isToggled = false
-       end
-   end
-})
-
-local isToggled = false
-
-EventTab:Toggle({
-   Name = "Auto Collect Hoppers Loot",
-   Default = false,
-   Callback = function(var)
-       isToggled = var
-       if isToggled then
-           task.spawn(function()
-               while isToggled do
-                   game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Clovers_HopperClaim"):InvokeServer()
-                   task.wait(5)
-               end
-           end)
-       else
-           isToggled = false
-       end
-   end
-})
-
-local isToggled = false
-
-local patches = { "Patch_1", "Patch_2", "Patch_3", "Patch_4", "Patch_5", "Patch_6", "Patch_7", "Patch_8" }
-local categories = { "", "_Farmer", "_Speed1", "_Speed2", "_Quality1", "_Quality2", "_Speed3", "_Quality3" }
-
-EventTab:Toggle({
-   Name = "Auto Buy Clover Pads",
-   Default = false,
-   Callback = function(var)
-       isToggled = var
-       if isToggled then
-           task.spawn(function()
-               while isToggled do
-                   for _, patch in ipairs(patches) do
-                       for _, category in ipairs(categories) do
-                           local args = {
-                               [1] = patch .. category,
-                               [2] = "Clover"
-                           }
-                           game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Tycoons: Purchase"):InvokeServer(unpack(args))
-                           task.wait()
-                       end
-                   end
-               end
-           end)
-       else
-           isToggled = false
-       end
-   end
-})
-
---Fish Tab
-local FishTab = Window:Tab({
-    Name = "Auto Fish",
-    tabColor = Color3.fromRGB(255, 105, 180),
-    Image = "rbxassetid://10709798174"
-})
-
-local FishingSpots = {
-    "Default",
-    "Ice",
-    "Kraken",
-    "Corrupted",
-}
-
-FishTab:Dropdown({
-    Name = "Select Fishing Spot",
-    Default = "Default",
-    Items = FishingSpots,
-    Multiselect = false,
-    Callback = function(Value)
-        selectedFishingSpot = Value
-    end
-})
-
-local isToggled = false
-
-FishTab:Toggle({
-    Name = "Auto Fish",
+Clover:Toggle({
+    Name = "Auto Collect Clovers",
     Default = false,
     Callback = function(var)
         isToggled = var
         if isToggled then
-            while isToggled do
-                local args = {
-                    [1] = selectedFishingSpot
-                }
-                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Fish"):InvokeServer(unpack(args))
-                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Success"):FireServer()
-                task.wait()
-            end
+            task.spawn(function()
+                local clovers = workspace.__THINGS.Clovers
+ 
+                local function fireTouchInterest(part)
+                    local playerChar = game.Players.LocalPlayer.Character
+                    local primaryPart = playerChar and playerChar.PrimaryPart or part
+                    firetouchinterest(part, primaryPart, 0)
+                    firetouchinterest(part, primaryPart, 1)
+                end
+ 
+                while isToggled do
+                    for _, model in pairs(clovers:GetChildren()) do
+                        local part = model:FindFirstChild("Part")
+                        if part then
+                            fireTouchInterest(part)
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        else
+            isToggled = false
         end
     end
-})
+ })
 
-local isToggled = false
-
-FishTab:Toggle({
-    Name = "Claim Fishing Storage Loot",
+ local isToggled = false
+ 
+ Clover:Toggle({
+    Name = "Auto Collect Hoppers Loot",
     Default = false,
     Callback = function(var)
         isToggled = var
         if isToggled then
-        while isToggled do
-            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_FishermanClaim"):InvokeServer()
-            task.wait()
+            task.spawn(function()
+                while isToggled do
+                    game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Clovers_HopperClaim"):InvokeServer()
+                    task.wait(5)
+                end
+            end)
+        else
+            isToggled = false
         end
     end
-})
+ })
