@@ -43,7 +43,7 @@ AutoFarm:Toggle({
    end
 })
 
---Clover Event
+--Clover Event Tab
 local Clover = window:Tab({
     Name = "Clover Event",
     tabColor = Color3.fromRGB(180, 240, 67),
@@ -137,3 +137,140 @@ Clover:Toggle({
         end
     end
  })
+
+ local isToggled = false
+
+local patches = { "Patch_1", "Patch_2", "Patch_3", "Patch_4", "Patch_5", "Patch_6", "Patch_7", "Patch_8" }
+local categories = { "", "_Farmer", "_Speed1", "_Speed2", "_Quality1", "_Quality2", "_Speed3", "_Quality3" }
+
+Clover:Toggle({
+    Name = "Auto Buy Clover Pads",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        if isToggled then
+            task.spawn(function()
+                while isToggled do
+                    for _, patch in ipairs(patches) do
+                        for _, category in ipairs(categories) do
+                            local args = {
+                                [1] = patch .. category,
+                                [2] = "Clover"
+                            }
+                            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Tycoons: Purchase"):InvokeServer(unpack(args))
+                            task.wait()
+                        end
+                    end
+                end
+            end)
+        else
+            isToggled = false
+        end
+    end
+ })
+
+--Mini Games Tab
+local MiniGames = window:Tab({
+    Name = "Mini Games",
+    tabColor = Color3.fromRGB(180, 240, 67),
+    Image = "rbxassetid://10709769841"
+})
+
+MiniGames:Label("Fishing!")
+
+local FishingSpots = {
+    "Default",
+    "Ice",
+    "Kraken",
+    "Corrupted",
+}
+
+MiniGames:Dropdown({
+    Name = "Select Fishing Spot",
+    Default = "Default",
+    Items = FishingSpots,
+    Multiselect = false,
+    Callback = function(Value)
+        selectedFishingSpot = Value
+    end
+})
+
+local isToggled = false
+
+MiniGames:Toggle({
+    Name = "Auto Fish",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        if isToggled then
+            while isToggled do
+                local args = {
+                    [1] = selectedFishingSpot
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Fish"):InvokeServer(unpack(args))
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_Success"):FireServer()
+                task.wait()
+            end
+        end
+    end
+})
+
+local isToggled = false
+
+MiniGames:Toggle({
+    Name = "Claim Fishing Storage Loot",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        while isToggled do
+            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Fishing_FishermanClaim"):InvokeServer()
+            task.wait(5)
+        end
+    end
+})
+
+MiniGames:Label("Mining!")
+
+local MiningSpots = {
+    "Dirt Ore",
+    "Stone Ore",
+    "Bronze Ore",
+    "Iron Ore",
+    "Gold Ore",
+    "Emerald Ore",
+    "Obsidian Ore",
+    "Runic Ore",
+    "Magma Ore",
+}
+
+MiniGames:Dropdown({
+    Name = "Select Mining Spot",
+    Default = "Default",
+    Items = MiningSpots,
+    Multiselect = false,
+    Callback = function(Value)
+        selectedMiningSpot = Value
+    end
+})
+
+MiniGames:Toggle({
+    Name = "Auto Mine",
+    Default = false,
+    Callback = function(var)
+        isToggled = var
+        if isToggled then
+            while isToggled do
+                local args = {
+                    [1] = true
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Mining_SetState"):InvokeServer(unpack(args))
+                
+                local args = {
+                    [1] = selectedMiningSpot
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Mining_Attack"):InvokeServer(unpack(args))
+                task.wait()
+            end
+        end
+    end
+})
